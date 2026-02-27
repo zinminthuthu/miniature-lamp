@@ -1,2 +1,3 @@
-# miniature-lamp
-Ok
+flask
+google-generativeai
+gunicorn
