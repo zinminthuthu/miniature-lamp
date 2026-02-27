@@ -9,15 +9,21 @@ genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @app.route("/")
 def home():
-    return "AI Recap Tool is Running!"
+    return """
+    <h2>AI Recap Tool</h2>
+    <form action="/generate" method="post">
+        <textarea name="script" rows="8" cols="40"
+        placeholder="ဒီနေရာမှာ script ထည့်ပါ..."></textarea><br><br>
+        <button type="submit">Generate SSML</button>
+    </form>
+    """
 
 @app.route("/generate", methods=["POST"])
 def generate():
-    data = request.json
-    script = data.get("script")
+    script = request.form.get("script")
 
     if not script:
-        return jsonify({"error": "No script provided"}), 400
+        return "No script provided"
 
     model = genai.GenerativeModel("gemini-1.5-flash")
 
@@ -29,9 +35,7 @@ def generate():
 
     response = model.generate_content(prompt)
 
-    return jsonify({
-        "ssml": response.text
-    })
+    return f"<h3>SSML Result:</h3><pre>{response.text}</pre>"
 
 if __name__ == "__main__":
     app.run()
