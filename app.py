@@ -4,8 +4,8 @@ import google.generativeai as genai
 
 app = Flask(__name__)
 
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
-model = genai.GenerativeModel("gemini-1.5-flash")
+# API KEY
+genai.configure(api_key=os.environ.get("GEMINI_API_KEY"))
 
 @app.route("/")
 def home():
@@ -14,20 +14,23 @@ def home():
 @app.route("/generate", methods=["POST"])
 def generate():
     data = request.json
-    user_text = data.get("text")
+    script = data.get("script")
+
+    if not script:
+        return jsonify({"error": "No script provided"}), 400
+
+    model = genai.GenerativeModel("gemini-1.5-flash")
 
     prompt = f"""
-    Rewrite this script as a short engaging video recap.
-    Also convert it into SSML format for voice generation.
+    Convert this script into SSML format for natural Myanmar voice narration:
 
-    Script:
-    {user_text}
+    {script}
     """
 
     response = model.generate_content(prompt)
 
     return jsonify({
-        "result": response.text
+        "ssml": response.text
     })
 
 if __name__ == "__main__":
